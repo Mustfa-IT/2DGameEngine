@@ -41,6 +41,9 @@ public class RenderingSystem implements Runnable {
         } while (bufferStrategy.contentsLost());
     }
     private void renderFrame(Graphics2D g) {
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
         // Get camera information
         CameraComponent camera = dominion.findEntitiesWith(CameraComponent.class)
                 .stream()
@@ -53,12 +56,6 @@ public class RenderingSystem implements Runnable {
         g.scale(camera.getZoom(), camera.getZoom());
         g.translate(-camera.getX(), -camera.getY());
 
-        // Clear background
-        g.setColor(Color.DARK_GRAY);
-        g.fillRect((int) camera.getX(), (int) camera.getY(),
-                (int) (canvas.getWidth() / camera.getZoom()),
-                (int) (canvas.getHeight() / camera.getZoom()));
-
         // Render all entities with transform and sprite
         dominion.findEntitiesWith(TransformComponent.class, SpriteComponent.class)
                 .stream()
@@ -68,14 +65,14 @@ public class RenderingSystem implements Runnable {
                     renderEntity(g, transform, sprite);
                 });
 
-        g.setTransform(originalTransform);  // Reset to screen coordinates
+        g.setTransform(originalTransform);
     }
     private void renderEntity(Graphics2D g, TransformComponent transform, SpriteComponent sprite) {
         // Convert physics meters to pixels and center sprite
         float x = transform.getX() * pixelsPerMeter;
         float y = transform.getY() * pixelsPerMeter;
-        int width = sprite.getWidth();
-        int height = sprite.getHeight();
+        int width = (int) (sprite.getWidth() * pixelsPerMeter);
+        int height = (int) (sprite.getHeight() * pixelsPerMeter);
 
         g.setColor(sprite.getColor());
         g.fillRect(
