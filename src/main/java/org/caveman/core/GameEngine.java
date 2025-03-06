@@ -67,7 +67,7 @@ public class GameEngine {
                 new SpriteComponent(Color.BLUE, 1, 1),
                 new PhysicsComponent(bodyDef, fixtureDef),
                 new Tags.PlayerTag(),
-                new MovementController(12, 12),
+                new MovementController(PLAYER_SPEED, PLAYER_JUMP_FORCE),
                 new CollisionComponent()
         );
 
