@@ -4,7 +4,6 @@ import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import dev.dominion.ecs.api.Scheduler;
 import org.caveman.components.*;
-import org.caveman.scenes.SceneManager;
 import org.caveman.systems.*;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -17,7 +16,6 @@ import java.awt.event.ComponentEvent;
 
 public class GameEngine {
     public static final float PIXELS_PER_METER = 32.0f;
-    private static GameEngine instance;
     private Dominion dominion;
     private World physicsWorld;
     private Scheduler scheduler;
@@ -29,14 +27,7 @@ public class GameEngine {
     private float PlayerSpeed = 10f;
     private float PlayerJumpForce = 12f;
 
-    public static GameEngine getInstance() {
-        if (instance == null) {
-            instance = new GameEngine();
-        }
-        return instance;
-    }
-
-    private GameEngine() {
+    public GameEngine() {
         dominion = Dominion.create();
         physicsWorld = new World(gravity);
         scheduler = dominion.createScheduler();
@@ -49,6 +40,8 @@ public class GameEngine {
         createPlayer();
         scheduler.tickAtFixedRate(60);
     }
+
+
     private void createPlayer() {
         // Define the physics body for the player.
         BodyDef bodyDef = new BodyDef();
@@ -74,12 +67,12 @@ public class GameEngine {
                 new SpriteComponent(Color.BLUE, 32, 32),
                 new PhysicsComponent(bodyDef, fixtureDef),
                 new Tags.PlayerTag(),
-                new MovementController(PlayerSpeed, PlayerJumpForce),
+                new MovementController(12, 12),
                 new CollisionComponent()
         );
 
         // Create the physics body immediately.
-        Body body = physicsWorld.createBody(bodyDef);
+        Body body = getPhysicsWorld().createBody(bodyDef);
         // Create the fixture and assign the player entity as its user data.
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(player);
@@ -88,8 +81,7 @@ public class GameEngine {
         player.get(PhysicsComponent.class).setBody(body);
 
         // Store the player for later reference and update the camera target.
-        this.player = player;
-        setCameraTarget(camera, player);
+        setCameraTarget(player);
     }
 
 
@@ -143,7 +135,6 @@ public class GameEngine {
         MovementSystem movementSystem = new MovementSystem(dominion, PIXELS_PER_METER);
         // Register the custom ContactListener
         physicsWorld.setContactListener(new GameContactListener(collisionSystem));
-
         scheduler.parallelSchedule(
                 physicsSystem,
                 collisionSystem,
@@ -209,10 +200,9 @@ public class GameEngine {
         );
     }
 
-    public void setCameraTarget(Entity cameraEntity, Entity target) {
-        cameraEntity.get(CameraComponent.class).follow(target);
+    public void setCameraTarget(Entity target){
+        camera.get(CameraComponent.class).follow(target);
     }
-
     public Dominion getDominion() {
         return dominion;
     }

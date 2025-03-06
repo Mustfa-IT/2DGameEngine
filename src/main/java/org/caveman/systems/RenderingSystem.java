@@ -5,9 +5,7 @@ import dev.dominion.ecs.api.Results;
 import org.caveman.components.CameraComponent;
 import org.caveman.components.SpriteComponent;
 import org.caveman.components.TransformComponent;
-import org.caveman.scenes.SceneManager;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferStrategy;
@@ -32,7 +30,7 @@ public class RenderingSystem implements Runnable {
             do {
                 Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
                 try {
-                    SceneManager.render(g);  // Use SceneManager to render
+                    renderFrame(g);
                 } finally {
                     g.dispose();
                 }
@@ -42,7 +40,36 @@ public class RenderingSystem implements Runnable {
             Toolkit.getDefaultToolkit().sync();
         } while (bufferStrategy.contentsLost());
     }
+    private void renderFrame(Graphics2D g) {
+        // Get camera information
+        CameraComponent camera = dominion.findEntitiesWith(CameraComponent.class)
+                .stream()
+                .findFirst()
+                .map(Results.With1::comp)
+                .orElseThrow();
 
+        // Apply camera transform
+        AffineTransform originalTransform = g.getTransform();
+        g.scale(camera.getZoom(), camera.getZoom());
+        g.translate(-camera.getX(), -camera.getY());
+
+        // Clear background
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect((int) camera.getX(), (int) camera.getY(),
+                (int) (canvas.getWidth() / camera.getZoom()),
+                (int) (canvas.getHeight() / camera.getZoom()));
+
+        // Render all entities with transform and sprite
+        dominion.findEntitiesWith(TransformComponent.class, SpriteComponent.class)
+                .stream()
+                .forEach(entity -> {
+                    TransformComponent transform = entity.comp1();
+                    SpriteComponent sprite = entity.comp2();
+                    renderEntity(g, transform, sprite);
+                });
+
+        g.setTransform(originalTransform);  // Reset to screen coordinates
+    }
     private void renderEntity(Graphics2D g, TransformComponent transform, SpriteComponent sprite) {
         // Convert physics meters to pixels and center sprite
         float x = transform.getX() * pixelsPerMeter;
