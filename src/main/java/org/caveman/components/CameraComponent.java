@@ -6,8 +6,8 @@ public class CameraComponent {
     private float x, y;
     private float zoom = 1.0f;
     private Entity target;
-    private final int viewportWidth;
-    private final int viewportHeight;
+    private int viewportWidth;
+    private int viewportHeight;
 
     public CameraComponent(int viewportWidth, int viewportHeight) {
         this.viewportWidth = viewportWidth;
@@ -56,8 +56,8 @@ public class CameraComponent {
     }
 
     public void setViewport(int width, int height) {
-        this.x = width / 2;
-        this.y = height / 2;
+        this.viewportWidth = width;
+        this.viewportHeight = height;
     }
 }
 

@@ -74,8 +74,8 @@ public class RenderingSystem implements Runnable {
         int height = sprite.getHeight();
 
         // Calculate top-left corner to center the sprite
-        int drawX = (int) (x - width / 2);
-        int drawY = (int) (y - height / 2);
+        int drawX = (int) (x - (float) width / 2);
+        int drawY = (int) (y - (float) height / 2);
 
         g.setColor(sprite.getColor());
         g.fillRect(drawX, drawY, width, height);

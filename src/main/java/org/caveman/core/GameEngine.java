@@ -47,7 +47,8 @@ public class GameEngine {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         canvas = new Canvas();
         canvas.setPreferredSize(new Dimension(800, 600));
-        window.add(canvas);
+        window.setLayout(new BorderLayout()); // Add layout manager
+        window.add(canvas, BorderLayout.CENTER); // Add to center
         window.pack();
         window.setLocationRelativeTo(null);
         window.setVisible(true);
@@ -61,8 +62,9 @@ public class GameEngine {
         window.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
+                Dimension newSize = canvas.getSize();
                 camera.get(CameraComponent.class)
-                        .setViewport(canvas.getWidth(), canvas.getHeight());
+                        .setViewport(newSize.width, newSize.height);
             }
         });
     }
