@@ -14,12 +14,12 @@ public class GameContactListener implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        collisionSystem.handleCollision(contact.getFixtureA(), contact.getFixtureB(), true);
+        collisionSystem.handleCollision(contact, true);
     }
 
     @Override
     public void endContact(Contact contact) {
-        collisionSystem.handleCollision(contact.getFixtureA(), contact.getFixtureB(), false);
+        collisionSystem.handleCollision(contact, false);
     }
 
     @Override

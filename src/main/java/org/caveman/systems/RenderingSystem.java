@@ -68,18 +68,16 @@ public class RenderingSystem implements Runnable {
         g.setTransform(originalTransform);
     }
     private void renderEntity(Graphics2D g, TransformComponent transform, SpriteComponent sprite) {
-        // Convert physics meters to pixels and center sprite
         float x = transform.getX() * pixelsPerMeter;
         float y = transform.getY() * pixelsPerMeter;
-        int width = (int) (sprite.getWidth() * pixelsPerMeter);
-        int height = (int) (sprite.getHeight() * pixelsPerMeter);
+        int width = sprite.getWidth();
+        int height = sprite.getHeight();
+
+        // Calculate top-left corner to center the sprite
+        int drawX = (int) (x - width / 2);
+        int drawY = (int) (y - height / 2);
 
         g.setColor(sprite.getColor());
-        g.fillRect(
-                (int)(x - width / 2f),  // Center X
-                (int)(y - height / 2f), // Center Y
-                width,
-                height
-        );
+        g.fillRect(drawX, drawY, width, height);
     }
 }

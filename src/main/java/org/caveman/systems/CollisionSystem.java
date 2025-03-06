@@ -5,7 +5,10 @@ import dev.dominion.ecs.api.Entity;
 import org.caveman.components.CollisionComponent;
 import org.caveman.components.MovementController;
 import org.caveman.components.Tags;
-import org.jbox2d.dynamics.Fixture;
+import org.caveman.core.GameEngine;
+import org.jbox2d.collision.WorldManifold;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.contacts.Contact;
 
 public class CollisionSystem implements Runnable {
     private final Dominion dominion;
@@ -23,9 +26,9 @@ public class CollisionSystem implements Runnable {
                 });
     }
 
-    public void handleCollision(Fixture fixtureA, Fixture fixtureB, boolean entering) {
-        Object dataA = fixtureA.getUserData();
-        Object dataB = fixtureB.getUserData();
+    public void handleCollision(Contact contact, boolean entering) {
+        Object dataA = contact.getFixtureA().getUserData();
+        Object dataB = contact.getFixtureB().getUserData();
 
 
         if (dataA == null) {
@@ -38,13 +41,19 @@ public class CollisionSystem implements Runnable {
         }
         Entity entityA = (Entity) dataA;
         Entity entityB = (Entity) dataB;
+        entityA.get(CollisionComponent.class).setColliding(true);
+        entityB.get(CollisionComponent.class).setColliding(true);
 
+
+        entityA.get(CollisionComponent.class).setOtherEntity(entityB);
+        entityB.get(CollisionComponent.class).setOtherEntity(entityA);
         // Check for ground collisions on both fixtures.
-        checkGroundCollision(entityA, entityB, entering);
-        checkGroundCollision(entityB, entityA, entering);
+        checkGroundCollision(contact,entityA, entityB, entering);
+        checkGroundCollision(contact,entityB, entityA, entering);
     }
 
-    private void checkGroundCollision(Entity entity, Entity other, boolean entering) {
+    private void checkGroundCollision(Contact contact ,Entity entity, Entity other, boolean entering) {
+        if(!entering) return;
         if (entity == null){
             System.out.println("Entity is null");
             return;
@@ -57,7 +66,14 @@ public class CollisionSystem implements Runnable {
         if (entity.has(Tags.PlayerTag.class) && other.has(Tags.GroundTag.class)) {
             MovementController controller = entity.get(MovementController.class);
             if (controller != null) {
-                controller.setGrounded(entering);
+                WorldManifold worldManifold = new WorldManifold();
+                contact.getWorldManifold(worldManifold);
+                Vec2 normal = worldManifold.normal;
+                float dot = Vec2.dot(normal, GameEngine.UP_VEC);
+                if(dot < - 0.9f)
+                {
+                    controller.setGrounded(true);
+                }
             }
         }
     }

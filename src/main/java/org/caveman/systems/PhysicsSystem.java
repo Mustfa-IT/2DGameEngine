@@ -56,6 +56,7 @@ public class PhysicsSystem implements Runnable {
         dominion.findEntitiesWith(PhysicsComponent.class, TransformComponent.class)
                 .stream()
                 .forEach(entity -> updateTransformFromBody(entity.entity()));
+
     }
 
     /**
