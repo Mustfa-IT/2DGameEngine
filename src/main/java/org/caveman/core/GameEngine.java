@@ -19,6 +19,7 @@ public class GameEngine {
     private static final float PLAYER_SPEED = 10f;
     private static final float PLAYER_JUMP_FORCE = 12f;
     private static final Vec2 GRAVITY = new Vec2(0, 9.8f * 2);
+    final float DESIRED_WORLD_WIDTH = 20.0f;
 
     private static final Dominion dominion = Dominion.create();
     private static final World physicsWorld = new World(GRAVITY);
@@ -57,8 +58,19 @@ public class GameEngine {
 
     private void setupCamera() {
         camera = dominion.createEntity(
-                new CameraComponent(canvas.getWidth(), canvas.getHeight())
+                new CameraComponent(canvas.getWidth() , canvas.getHeight())
         );
+
+        // Add a listener to update the camera size when the window is resized
+        window.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                CameraComponent camera = GameEngine.this.camera.get(CameraComponent.class);
+                // Pass the canvas dimensions and the desired world width
+                camera.resize(canvas.getWidth() , canvas.getHeight(), DESIRED_WORLD_WIDTH);
+            }
+        });
+
         camera.get(CameraComponent.class).setZoom(1.0f);
     }
 
