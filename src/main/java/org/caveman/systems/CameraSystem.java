@@ -7,34 +7,30 @@ import org.caveman.core.GameEngine;
 import org.caveman.core.InputHandler;
 
 import java.awt.event.KeyEvent;
-
 public class CameraSystem implements Runnable {
-    private final Dominion dominion;
+    private Dominion dominion;
 
-    public CameraSystem(Dominion dominion) {
+    public CameraSystem(Dominion dominion ){
         this.dominion = dominion;
     }
 
     @Override
     public void run() {
         dominion.findEntitiesWith(CameraComponent.class)
-                .stream()
                 .forEach(entity -> {
                     CameraComponent camera = entity.comp();
-                    if (camera.getTarget() != null && camera.getTarget().isEnabled()) {
-                        TransformComponent targetTransform = camera.getTarget().get(TransformComponent.class);
-                        if (targetTransform != null) {
-                            if(InputHandler.isKeyPressed(KeyEvent.VK_UP)){
-                                camera.setZoom(camera.getZoom() + 0.01f);
-                            }
-                            if(InputHandler.isKeyPressed(KeyEvent.VK_DOWN)){
-                                camera.setZoom(camera.getZoom() - 0.01f);
-                            }
-                            // Convert target position to pixels for camera
-                            float targetXPixels = targetTransform.getX() * GameEngine.PIXELS_PER_METER;
-                            float targetYPixels = targetTransform.getY() * GameEngine.PIXELS_PER_METER;
-                            camera.update(targetXPixels, targetYPixels);
-                        }
+                    if (camera.getTarget() != null) {
+                        TransformComponent target = camera.getTarget().get(TransformComponent.class);
+
+                        // Increased speed factor (0.1f -> 0.3f for 30% per frame)
+                        float lerpFactor = 0.9f; // Adjust this value (0.3 = fast, 0.1 = slow)
+
+                        // Optional: For frame-rate independence
+                         double deltaTime = GameEngine.getDeltaTime();
+                         lerpFactor = 1 - (float) Math.pow(0.1f, deltaTime);
+
+                        camera.getPosition().x += ((target.getX() * GameEngine.PIXELS_PER_METER) - camera.getPosition().x) * lerpFactor;
+                        camera.getPosition().y += ((target.getY() * GameEngine.PIXELS_PER_METER) - camera.getPosition().y) * lerpFactor;
                     }
                 });
     }

@@ -20,13 +20,13 @@ public class RenderingSystem implements Runnable {
         this.dominion = dominion;
         this.canvas = canvas;
         this.pixelsPerMeter = pixelsPerMeter;
+        canvas.setIgnoreRepaint(true); // Prevent AWT from interfering
         canvas.createBufferStrategy(3);
         bufferStrategy = canvas.getBufferStrategy();
     }
 
     @Override
     public void run() {
-        do {
             do {
                 Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
                 try {
@@ -38,7 +38,6 @@ public class RenderingSystem implements Runnable {
 
             bufferStrategy.show();
             Toolkit.getDefaultToolkit().sync();
-        } while (bufferStrategy.contentsLost());
     }
     private void renderFrame(Graphics2D g) {
         g.setColor(Color.DARK_GRAY);

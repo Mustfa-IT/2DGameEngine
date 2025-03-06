@@ -20,18 +20,15 @@ public class GameEngine {
     private static final float PLAYER_JUMP_FORCE = 12f;
     private static final Vec2 GRAVITY = new Vec2(0, 9.8f * 2);
 
-    private final Dominion dominion;
-    private final World physicsWorld;
-    private final Scheduler scheduler;
+    private static final Dominion dominion = Dominion.create();
+    private static final World physicsWorld = new World(GRAVITY);
+    private static final Scheduler scheduler = dominion.createScheduler();
     private JFrame window;
     private Canvas canvas;
     private Entity player;
     private Entity camera;
 
     public GameEngine() {
-        dominion = Dominion.create();
-        physicsWorld = new World(GRAVITY);
-        scheduler = dominion.createScheduler();
         setupWindow();
         setupInput();
         setupCamera();
@@ -40,6 +37,10 @@ public class GameEngine {
         createObstacles();
         createPlayer();
         scheduler.tickAtFixedRate(60);
+    }
+
+    public static double getDeltaTime() {
+        return scheduler.deltaTime();
     }
 
     private void setupWindow() {
@@ -59,14 +60,6 @@ public class GameEngine {
                 new CameraComponent(canvas.getWidth(), canvas.getHeight())
         );
         camera.get(CameraComponent.class).setZoom(1.0f);
-        window.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                Dimension newSize = canvas.getSize();
-                camera.get(CameraComponent.class)
-                        .setViewport(newSize.width, newSize.height);
-            }
-        });
     }
 
     private void setupInput() {
@@ -141,7 +134,7 @@ public class GameEngine {
     }
 
     public void setCameraTarget(Entity target) {
-        camera.get(CameraComponent.class).follow(target);
+        camera.get(CameraComponent.class).setTarget(target);
     }
 
     // Getters (Removed unnecessary setters)
