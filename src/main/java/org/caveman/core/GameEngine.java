@@ -37,6 +37,7 @@ public class GameEngine {
         createGround();
         createObstacles();
         createPlayer();
+        createLights();
         scheduler.tickAtFixedRate(60);
     }
 
@@ -48,7 +49,7 @@ public class GameEngine {
         window = new JFrame("2D Game Engine");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         canvas = new Canvas();
-        canvas.setPreferredSize(new Dimension(800, 600));
+        canvas.setPreferredSize(new Dimension(1240, 800));
         window.setLayout(new BorderLayout()); // Add layout manager
         window.add(canvas, BorderLayout.CENTER); // Add to center
         window.pack();
@@ -81,14 +82,13 @@ public class GameEngine {
     }
 
     private void setupSystems() {
-        RenderingSystem renderingSystem = new RenderingSystem(dominion, canvas, PIXELS_PER_METER);
+        RenderingSystem renderingSystem = new RenderingSystem(dominion, canvas,physicsWorld, PIXELS_PER_METER);
         PhysicsSystem physicsSystem = new PhysicsSystem(
                 dominion, physicsWorld, 1/60f, PIXELS_PER_METER
         );
         CameraSystem cameraSystem = new CameraSystem(dominion);
         CollisionSystem collisionSystem = new CollisionSystem(dominion);
         MovementSystem movementSystem = new MovementSystem(dominion, PIXELS_PER_METER);
-
         physicsWorld.setContactListener(new GameContactListener(collisionSystem));
 
         scheduler.parallelSchedule(
@@ -96,7 +96,7 @@ public class GameEngine {
                 physicsSystem,     // Update physics
                 collisionSystem,   // Handle collisions
                 cameraSystem,      // Update camera
-                renderingSystem    // Render last
+                renderingSystem
         );
     }
     private void createPlayer() {
@@ -142,6 +142,13 @@ public class GameEngine {
                 4f,
                 1f,1f,
                 Color.red
+        );
+    }
+
+    private void createLights() {
+        GameObjectFactory.createLight(
+                dominion,
+                6,6
         );
     }
 

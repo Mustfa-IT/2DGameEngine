@@ -105,4 +105,26 @@ public class GameObjectFactory {
 
         return obstacle;
     }
+    public static Entity createLight(
+            Dominion dominion,
+            float posX,
+            float posY
+    ) {
+        // Define some example light properties.
+        Color lightColor = new Color(255, 255, 180); // A warm light color.
+        float range = 5f;      // Range in meters.
+        int rays = 128;         // Number of rays to cast for smooth light.
+        float baseIntensity = 0.8f; // Base intensity (0 to 1).
+        float pulseSpeed = 2.0f;    // Speed of pulsation.
+        float pulseAmplitude = 0.1f; // Amplitude of pulsation.
+
+        // Create the light entity with a TransformComponent and a LightEmitterComponent.
+        Entity light = dominion.createEntity(
+                new TransformComponent(posX, posY),
+                new LightEmitterComponent(lightColor, range, rays, baseIntensity, pulseSpeed, pulseAmplitude)
+        );
+
+        return light;
+    }
+
 }

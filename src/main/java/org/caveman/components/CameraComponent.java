@@ -56,7 +56,42 @@ public class CameraComponent {
             }
         }
     }
+    /**
+     * Checks if an object with a given position and dimensions (in pixels) is in view.
+     *
+     * @param x              the center x position of the object (in world units)
+     * @param y              the center y position of the object (in world units)
+     * @param objectWidth    the object's width in pixels
+     * @param objectHeight   the object's height in pixels
+     * @param pixelsPerMeter conversion factor from world units to pixels
+     * @return true if the object is in the camera's view, false otherwise.
+     */
+    public boolean isInView(float x, float y, float objectWidth, float objectHeight, float pixelsPerMeter) {
+        // Convert object dimensions from pixels to world units.
+        float worldObjectWidth = objectWidth / pixelsPerMeter;
+        float worldObjectHeight = objectHeight / pixelsPerMeter;
 
+        // Assuming (x, y) is the object's center, compute its bounding box.
+        float objectLeft = x - worldObjectWidth / 2;
+        float objectRight = x + worldObjectWidth / 2;
+        float objectTop = y - worldObjectHeight / 2;
+        float objectBottom = y + worldObjectHeight / 2;
+
+        // Introduce a factor to shrink the view for testing.
+        float testFactor = 6f;
+
+        // Calculate the view bounds in world units, scaled down.
+        float viewWidth = (orthoWidth / zoom) * testFactor;
+        float viewHeight = (orthoHeight / zoom) * testFactor;
+        float cameraLeft = position.x - viewWidth / 2;
+        float cameraRight = position.x + viewWidth / 2;
+        float cameraTop = position.y - viewHeight / 2;
+        float cameraBottom = position.y + viewHeight / 2;
+
+        // Check if the object intersects the scaled camera view.
+        return (objectRight >= cameraLeft && objectLeft <= cameraRight &&
+                objectBottom >= cameraTop && objectTop <= cameraBottom);
+    }
     /**
      * Retrieves the target entity's position.
      * Adapt this method if you need a more complex extraction of the target’s world position.
