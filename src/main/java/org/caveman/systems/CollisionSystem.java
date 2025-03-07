@@ -53,25 +53,15 @@ public class CollisionSystem implements Runnable {
     }
 
     private void checkGroundCollision(Contact contact ,Entity entity, Entity other, boolean entering) {
-        if(!entering) return;
-        if (entity == null){
-            System.out.println("Entity is null");
-            return;
-        }
-        if (other == null){
-            System.out.println("Other is null");
-            return;
-        }
-        // If the entity is the player and the other entity is ground, update the grounded state.
+        if (!entering) return;
         if (entity.has(Tags.PlayerTag.class) && other.has(Tags.GroundTag.class)) {
             MovementController controller = entity.get(MovementController.class);
-            if (controller != null) {
+            if (controller != null && !controller.isJustJumped()) {
                 WorldManifold worldManifold = new WorldManifold();
                 contact.getWorldManifold(worldManifold);
                 Vec2 normal = worldManifold.normal;
                 float dot = Vec2.dot(normal, GameEngine.UP_VEC);
-                if(dot < - 0.9f)
-                {
+                if (dot < -0.9f) {
                     controller.setGrounded(true);
                 }
             }

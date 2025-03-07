@@ -36,7 +36,10 @@ public class MovementSystem implements Runnable {
         float moveDirection = 0f;
         if(InputHandler.isKeyPressed(KeyEvent.VK_A)) moveDirection -= 1;
         if(InputHandler.isKeyPressed(KeyEvent.VK_D)) moveDirection += 1;
-
+        if(entity.get(PhysicsComponent.class).getBody().getLinearVelocity().y == 0){
+            controller.setGrounded(true);
+            controller.setJustJumped(false);
+        }
         Body body = physics.getBody();
         if(body == null) return;
         Vec2 velocity = body.getLinearVelocity();
@@ -49,7 +52,7 @@ public class MovementSystem implements Runnable {
     }
 
     private void handleJump(Entity entity, MovementController controller, PhysicsComponent physics) {
-        if(InputHandler.isKeyPressed(KeyEvent.VK_SPACE) && controller.isGrounded()) {
+        if (InputHandler.isKeyPressed(KeyEvent.VK_SPACE) && controller.isGrounded()) {
             System.out.println("Jumping");
             Body body = physics.getBody();
             body.applyLinearImpulse(
@@ -57,7 +60,7 @@ public class MovementSystem implements Runnable {
                     body.getWorldCenter()
             );
             controller.setGrounded(false);
+            controller.setJustJumped(true);
         }
-
     }
 }
